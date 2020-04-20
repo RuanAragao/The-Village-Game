@@ -12,6 +12,7 @@ const tileSize = 32;
 const tileScale = 1;
 
 let player;
+let tilesCollision;
 let walls = [];
 let speed = 4;
 let keys = {};
@@ -43,7 +44,8 @@ app.stage.addChild(loaderScreenContainer);
 app.loader.baseUrl = "images";
 app.loader
     .add("tileset", "PathAndObjects.png")
-    .add("json", "map.json");
+    .add("jsonMap", "map.json")
+    .add("jsonTileset", "tileset.json");
 
 app.loader.onProgress.add(loaderScreen);
 app.loader.onComplete.add(render);
@@ -75,9 +77,22 @@ app.ticker.add(gameLoop);
 // }
 
 let tileCollection = [];
+// let tilesCollision = [];
 
 function render() {
     const resources = app.loader.resources;
+
+    const jsonMap = app.loader.resources.jsonMap.data;
+    const jsonTileset = app.loader.resources.jsonTileset.data;
+
+    /**
+     * Lista o id dos tiles que possuem colisão
+     */
+    tilesCollision = jsonTileset.tiles.map((tileId) => {
+        return tileId.id;
+    });
+
+    // console.log(tilesCollision);
     
     loaderScreenContainer.visible = false;
     
@@ -91,12 +106,11 @@ function render() {
             resources.tileset.texture,
             new PIXI.Rectangle(x * tileSize, y * tileSize, tileSize, tileSize)
         );
-            
+        
         tileTexturesSet.push(tileTextures[i]);
     }
 
     // **********
-    const jsonMap = app.loader.resources.json.data;
 
     for (const layer in jsonMap.layers) {
         const layerNow = jsonMap.layers[layer];
@@ -105,10 +119,24 @@ function render() {
         for (let column = 0; column < layerNow.height; column++) {
             for (let row = 0; row < layerNow.width; row++) {
                 const tile = layerNow.data[row * layerNow.height + column];
-                console.log(tile);
+                // console.log(tile);
                 
                 let x = column * tileSize;
                 let y = row * tileSize;
+
+                // Cria a lista de tiles e suas coodenasdas para colisão
+                // 0: {x: 32, y: 0, width: 32, height: 32}
+                for (let tl in tilesCollision) {
+                    if ((tile - 1) == tilesCollision[tl]) {
+                        walls.push({
+                            x,
+                            y,
+                            width: tileSize,
+                            height: tileSize
+                        });
+                    }
+                }
+
                 
                 const tileRender = new PIXI.Sprite(tileTextures[tile - 1]); // "-1" para compensar exportação do tild que não sei por qual motivo exporta com +1
                 tileRender.anchor.set(0);
@@ -119,6 +147,30 @@ function render() {
             }
         }
     }
+
+    // ********** COLLISION ******************
+
+    // for (const layer in jsonMap.layers) {
+    //     const layerNow = jsonMap.layers[layer];
+    //     // console.log(layerNow);
+
+    //     for (let column = 0; column < layerNow.height; column++) {
+    //         for (let row = 0; row < layerNow.width; row++) {
+    //             const tile = layerNow.data[row * layerNow.height + column];
+    //             // console.log(tile);
+                
+    //             let x = column * tileSize;
+    //             let y = row * tileSize;
+                
+    //             const tileRender = new PIXI.Sprite(tileTextures[tile - 1]); 
+    //             tileRender.anchor.set(0);
+    //             tileRender.scale.set(tileScale);
+    //             tileRender.x = x;
+    //             tileRender.y = y;
+    //             app.stage.addChild(tileRender);
+    //         }
+    //     }
+    // }
     // ****************
 
 
@@ -188,21 +240,22 @@ function render() {
     ];
 
     // Tile data
-    for (let row in stageChart) {
-        for (let column in stageChart) {
-            let tile = stageChart[row][column];
-            // console.log(tile);
-            if (tile.collision) {
-                let wall = {
-                    x: tileSize * column,
-                    y: tileSize * row,
-                    width: tileSize,
-                    height: tileSize
-                };
-                walls.push(wall);
-            }
-        }
-    }
+    // for (let row in stageChart) {
+    //     for (let column in stageChart) {
+    //         let tile = stageChart[row][column];
+    //         // console.log(tile);
+    //         if (tile.collision) {
+    //             let wall = {
+    //                 x: tileSize * column,
+    //                 y: tileSize * row,
+    //                 width: tileSize,
+    //                 height: tileSize
+    //             };
+    //             walls.push(wall);
+    //         }
+    //     }
+    // }
+
 
     // Stage render
     // for (let row in stageChart) {
@@ -243,7 +296,7 @@ function render() {
     player = new PIXI.Sprite.from(X.texture);
     player.anchor.set(0);
     player.scale.set(tileScale);
-    player.x = tileSize * 4;
+    player.x = tileSize * 6;
     player.y = tileSize * 6;
 
     app.stage.addChild(player);
