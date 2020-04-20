@@ -59,25 +59,7 @@ app.loader.load();
 app.ticker.add(gameLoop);
 
 
-
-
-// for (let row in chart) {
-//     for (let column in chart) {
-//         let tile = chart[row][column];
-//         if (tile === "D") {
-//             let wall = {
-//                 x: tileSize * column,
-//                 y: tileSize * row,
-//                 width: tileSize,
-//                 height: tileSize
-//             };
-//             walls.push(wall);
-//         }
-//     }
-// }
-
 let tileCollection = [];
-// let tilesCollision = [];
 
 function render() {
     const resources = app.loader.resources;
@@ -116,9 +98,9 @@ function render() {
         const layerNow = jsonMap.layers[layer];
         // console.log(layerNow);
 
-        for (let column = 0; column < layerNow.height; column++) {
-            for (let row = 0; row < layerNow.width; row++) {
-                const tile = layerNow.data[row * layerNow.height + column];
+        for (let column = 0; column < layerNow.width; column++) {
+            for (let row = 0; row < layerNow.height; row++) {
+                const tile = layerNow.data[row * layerNow.width + column];
                 // console.log(tile);
                 
                 let x = column * tileSize;
@@ -148,152 +130,8 @@ function render() {
         }
     }
 
-    // ********** COLLISION ******************
-
-    // for (const layer in jsonMap.layers) {
-    //     const layerNow = jsonMap.layers[layer];
-    //     // console.log(layerNow);
-
-    //     for (let column = 0; column < layerNow.height; column++) {
-    //         for (let row = 0; row < layerNow.width; row++) {
-    //             const tile = layerNow.data[row * layerNow.height + column];
-    //             // console.log(tile);
-                
-    //             let x = column * tileSize;
-    //             let y = row * tileSize;
-                
-    //             const tileRender = new PIXI.Sprite(tileTextures[tile - 1]); 
-    //             tileRender.anchor.set(0);
-    //             tileRender.scale.set(tileScale);
-    //             tileRender.x = x;
-    //             tileRender.y = y;
-    //             app.stage.addChild(tileRender);
-    //         }
-    //     }
-    // }
-    // ****************
-
-
-    // Bloc carac
-    
-    const bloc = {
-        blank: {
-            size: 32,
-            texture: tileTextures[143],
-            collision: false,
-        },
-        player: {
-            size: 32,
-            texture: tileTextures[215],
-            collision: true,
-        },
-        solid: {
-            size: 32,
-            texture: tileTextures[1],
-            collision: true,
-        },
-        ground: {
-            size: 32,
-            texture: tileTextures[17],
-            collision: false,
-        },
-        ground2: {
-            size: 32,
-            collision: false,
-            texture: {
-                vertical: tileTextures[17],
-                horizontal: tileTextures[4],
-                curve: tileTextures[5],
-            },
-        },
-        aqua: {
-            size: 32,
-            texture: tileTextures[3],
-            collision: true,
-        },
-        grass: {
-            size: 32,
-            texture: tileTextures[4],
-            collision: false,
-        },
-    };
-
-    const A = bloc.blank;   // #ffffff
-    const B = bloc.ground;
-    const C = bloc.aqua;    // #33a5ff
-    const D = bloc.solid;   // #b4b4b4
-
-    const X = bloc.player;  // The player
-
-    // Stages
-    const stageChart = [
-        [A,C,D,D,D,D,D,B,C,A],
-        [A,C,D,B,B,B,D,B,C,A],
-        [A,C,D,B,D,D,D,B,C,A],
-        [A,C,D,B,B,B,B,B,C,A],
-        [A,C,D,D,B,D,D,D,D,D],
-        [A,C,C,C,B,C,C,C,C,A],
-        [A,C,C,C,B,C,C,C,C,A],
-        [A,C,C,C,B,C,C,C,C,A],
-        [A,C,C,C,B,C,C,C,C,A],
-        [A,C,C,C,B,C,C,C,C,A],
-    ];
-
-    // Tile data
-    // for (let row in stageChart) {
-    //     for (let column in stageChart) {
-    //         let tile = stageChart[row][column];
-    //         // console.log(tile);
-    //         if (tile.collision) {
-    //             let wall = {
-    //                 x: tileSize * column,
-    //                 y: tileSize * row,
-    //                 width: tileSize,
-    //                 height: tileSize
-    //             };
-    //             walls.push(wall);
-    //         }
-    //     }
-    // }
-
-
-    // Stage render
-    // for (let row in stageChart) {
-    //     for (let column in stageChart[row]) {
-    //         let tile = stageChart[row][column];
-
-    //         let x = column * tileSize;
-    //         let y = row * tileSize;
-            
-    //         const tileRender = new PIXI.Sprite(tile.texture);
-    //         tileRender.anchor.set(0);
-    //         tileRender.scale.set(tileScale);
-    //         tileRender.x = x;
-    //         tileRender.y = y;
-    //         app.stage.addChild(tileRender);
-    //     }
-    // }
-
-    // ---------------------------------------------------------------------------
-
-    // for (let row in map) {
-    //     for (let column in map[row]) {
-    //         let tile = map[row][column];
-
-    //         let x = column * tileSize;
-    //         let y = row * tileSize;
-            
-    //         const tileRender = new PIXI.Sprite(tileTextures[tile]);
-    //         tileRender.anchor.set(0);
-    //         tileRender.scale.set(tileScale);
-    //         tileRender.x = x;
-    //         tileRender.y = y;
-    //         app.stage.addChild(tileRender);
-    //     }
-    // }
-
     // Player
-    player = new PIXI.Sprite.from(X.texture);
+    player = new PIXI.Sprite.from(tileTextures[215]);
     player.anchor.set(0);
     player.scale.set(tileScale);
     player.x = tileSize * 6;
